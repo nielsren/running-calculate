@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>马拉松配速计算器</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    label { display: inline-block; width: 60px; }
+    input { margin: 5px; }
+    button { margin: 10px 5px; padding: 5px 15px; }
+  </style>
+</head>
+<body>
+  <h2>马拉松配速计算器</h2>
+  <p>输入距离、时间、配速中的任意两项，点击计算即可得出第三项：</p>
+
+  <div>
+    <label>距离:</label>
+    <input type="number" id="distance" step="0.001" value="42.195"> 公里
+  </div>
+
+  <div>
+    <label>时间:</label>
+    <input type="number" id="hours" value="4"> 时
+    <input type="number" id="minutes" value="0"> 分
+    <input type="number" id="seconds" value="0"> 秒
+  </div>
+
+  <div>
+    <label>配速:</label>
+    <input type="number" id="paceMin" value="5"> 分
+    <input type="number" id="paceSec" value="42"> 秒/公里
+  </div>
+
+  <button onclick="calculate()">计算</button>
+  <button onclick="resetForm()">清除</button>
+
+  <h3>结果:</h3>
+  <p id="result"></p>
+
+  <script>
+    function calculate() {
+      let distance = parseFloat(document.getElementById("distance").value);
+      let h = parseInt(document.getElementById("hours").value) || 0;
+      let m = parseInt(document.getElementById("minutes").value) || 0;
+      let s = parseInt(document.getElementById("seconds").value) || 0;
+      let paceMin = parseInt(document.getElementById("paceMin").value) || 0;
+      let paceSec = parseInt(document.getElementById("paceSec").value) || 0;
+
+      let totalSeconds = h * 3600 + m * 60 + s;
+      let paceSeconds = paceMin * 60 + paceSec;
+
+      let resultText = "";
+
+      if (distance && totalSeconds) {
+        // 已知距离和时间 → 算配速
+        let pace = totalSeconds / distance;
+        let pm = Math.floor(pace / 60);
+        let ps = Math.round(pace % 60);
+        resultText = `配速：${pm}分${ps}秒/公里`;
+      } else if (distance && paceSeconds) {
+        // 已知距离和配速 → 算时间
+        let total = distance * paceSeconds;
+        let hh = Math.floor(total / 3600);
+        let mm = Math.floor((total % 3600) / 60);
+        let ss = Math.round(total % 60);
+        resultText = `总时间：${hh}小时${mm}分${ss}秒`;
+      } else if (totalSeconds && paceSeconds) {
+        // 已知时间和配速 → 算距离
+        let dist = totalSeconds / paceSeconds;
+        resultText = `距离：${dist.toFixed(3)}公里`;
+      } else {
+        resultText = "请输入任意两项！";
+      }
+
+      document.getElementById("result").innerText = resultText;
+    }
+
+    function resetForm() {
+      document.getElementById("distance").value = "";
+      document.getElementById("hours").value = "";
+      document.getElementById("minutes").value = "";
+      document.getElementById("seconds").value = "";
+      document.getElementById("paceMin").value = "";
+      document.getElementById("paceSec").value = "";
+      document.getElementById("result").innerText = "";
+    }
+  </script>
+</body>
+</html>
